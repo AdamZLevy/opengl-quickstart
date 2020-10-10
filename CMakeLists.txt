@@ -73,7 +73,7 @@ file(GLOB IMGUI_SRC
         )
 
 # project files setup
-set(OPENGL_RENDERER src/opengl-renderer/Renderer.cpp src/opengl-renderer/Renderer.h src/opengl-renderer/VertexBuffer.cpp src/opengl-renderer/VertexBuffer.h)
+set(OPENGL_RENDERER src/opengl-renderer/Renderer.cpp src/opengl-renderer/Renderer.h src/opengl-renderer/VertexBuffer.cpp src/opengl-renderer/VertexBuffer.h src/opengl-renderer/IndexBuffer.cpp src/opengl-renderer/IndexBuffer.h)
 
 # target setup
 add_executable(opengl-quickstart main.cpp ${IMGUI_SRC} ${OPENGL_RENDERER})
