@@ -2,7 +2,6 @@
 #include "VertexBufferLayout.h"
 
 void VertexBufferLayout::pushFloat(unsigned int count) {
-    std::cout << "CALLED!!!!!!!!!!!!" << std::endl;
     _elements.push_back({GL_FLOAT, count, GL_FALSE});
     _stride += count * VertexBufferElement::getSizeOfType(GL_FLOAT);
 }

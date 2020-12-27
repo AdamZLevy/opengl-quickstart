@@ -6,7 +6,6 @@
 #include <string>
 
 Shader::Shader(unsigned int type, const std::string &filePath): _type(type), _filePath(filePath), _rendererId(0) {
-    Shader::compileShader(type, filePath);
     std::string shader = Shader::getShader(filePath);
     this->_rendererId = Shader::createShader(type, shader);
 }
