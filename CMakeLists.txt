@@ -28,6 +28,7 @@ include_directories(
         ${GLFW_PATH}/include/GLFW
         ${GLEW_PATH}/include
         ${IMGUI_PATH}
+        lib
 )
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -47,7 +48,7 @@ endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 set(GLEW_SOURCE
         ${GLEW_PATH}/src/glew.c
-        )
+        src/opengl-renderer/Texture.cpp src/opengl-renderer/Texture.h)
 
 
 add_library(GLEW STATIC
@@ -72,11 +73,16 @@ file(GLOB IMGUI_SRC
         "${IMGUI_PATH}/*.cpp"
         )
 
+file(GLOB STB_IMAGE
+        "lib/stb_image.h"
+        "lib/stb_image.cpp"
+        )
+
 # project files setup
-set(OPENGL_RENDERER src/opengl-renderer/Renderer.cpp src/opengl-renderer/Renderer.h src/opengl-renderer/VertexBuffer.cpp src/opengl-renderer/VertexBuffer.h src/opengl-renderer/IndexBuffer.cpp src/opengl-renderer/IndexBuffer.h)
+set(OPENGL_RENDERER src/opengl-renderer/Renderer.cpp src/opengl-renderer/Renderer.h src/opengl-renderer/VertexBuffer.cpp src/opengl-renderer/VertexBuffer.h src/opengl-renderer/IndexBuffer.cpp src/opengl-renderer/IndexBuffer.h src/opengl-renderer/VertexArray.cpp src/opengl-renderer/VertexArray.h src/opengl-renderer/VertexBufferLayout.cpp src/opengl-renderer/VertexBufferLayout.h src/opengl-renderer/Shader.cpp src/opengl-renderer/Shader.h)
 
 # target setup
-add_executable(opengl-quickstart main.cpp ${IMGUI_SRC} ${OPENGL_RENDERER})
+add_executable(opengl-quickstart main.cpp ${IMGUI_SRC} ${STB_IMAGE} ${OPENGL_RENDERER})
 
 target_link_libraries(opengl-quickstart ${ALL_LIBS})
 
@@ -87,5 +93,11 @@ add_compile_options("$<$<CONFIG:DEBUG>:-DDEBUG>")
 add_custom_command(TARGET opengl-quickstart POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E rm -rf $<TARGET_FILE_DIR:opengl-quickstart>/shader)
 add_custom_command(TARGET opengl-quickstart POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rm -rf $<TARGET_FILE_DIR:opengl-quickstart>/resources)
+
+add_custom_command(TARGET opengl-quickstart POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/shader $<TARGET_FILE_DIR:opengl-quickstart>/shader)
+add_custom_command(TARGET opengl-quickstart POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:opengl-quickstart>/resources)
