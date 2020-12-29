@@ -16,7 +16,7 @@ add_definitions(
 # libraries setup
 set(GLFW_PATH lib/glfw-3.3.2)
 set(GLEW_PATH lib/glew-2.1.0)
-set(IMGUI_PATH lib/imgui)
+set(IMGUI_PATH lib/imgui-docking)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -48,7 +48,7 @@ endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 set(GLEW_SOURCE
         ${GLEW_PATH}/src/glew.c
-        src/opengl-renderer/Texture.cpp src/opengl-renderer/Texture.h)
+        src/opengl-renderer/Texture.cpp src/opengl-renderer/Texture.h src/ui/UI.cpp src/ui/UI.h src/ui/Widget.cpp src/ui/Widget.h src/ui/widgets/Info.cpp src/ui/widgets/Info.h)
 
 
 add_library(GLEW STATIC

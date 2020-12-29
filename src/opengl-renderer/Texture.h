@@ -21,6 +21,8 @@ public:
     inline int getWidth() const { return this->_width; }
 
     inline int getHeight() const { return this->_height; }
+
+    inline int getId() const { return this->_rendererId; }
 };
 
 
