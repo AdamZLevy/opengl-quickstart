@@ -22,6 +22,7 @@ class Renderer {
 public:
     void clear() const;
     void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+    void drawArrays(const VertexArray& va, const Shader& shader) const;
 };
 
 #endif //OPENGL_QUICKSTART_RENDERER_H

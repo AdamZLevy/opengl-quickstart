@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <imgui_impl_opengl3.h>
+#include <fstream>
+#include <sstream>
 
 #include "src/opengl-renderer/Renderer.h"
 #include "src/opengl-renderer/VertexBuffer.h"
@@ -14,136 +16,86 @@
 #include "src/ui/UI.h"
 
 static void GLAPIENTRY glMessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
-                              const GLchar *message, const void *userParam) {
+                                         const GLchar *message, const void *userParam) {
     printf("Message from OpenGL:\nSource: 0x%x\nType: 0x%x\n"
            "Id: 0x%x\nSeverity: 0x%x\n", source, type, id, severity);
     printf("%s\n", message);
 }
 
 int main() {
-    GLFWwindow *window;
-
-    /* Initialize the library */
+    glewExperimental = true; // Needed for core profile
     if (!glfwInit()) {
+        fprintf(stderr, "Failed to initialize GLFW\n");
         return -1;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // We want OpenGL 3.3
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL
 
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(1024, 1024, "OpenGL Quickstart", nullptr, nullptr);
-    if (!window) {
+// Open a window and create its OpenGL context
+    GLFWwindow *window; // (In the accompanying source code, this variable is global for simplicity)
+    window = glfwCreateWindow(1024, 768, "Tutorial 01", NULL, NULL);
+    if (window == NULL) {
+        fprintf(stderr,
+                "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
         glfwTerminate();
         return -1;
     }
-
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-
-    /* Sync with monitor refresh rate */
-    glfwSwapInterval(1);
-
+    glfwMakeContextCurrent(window); // Initialize GLEW
+    glewExperimental = true; // Needed in core profile
     if (glewInit() != GLEW_OK) {
-        std::cout << "GLEW Init error" << std::endl;
+        fprintf(stderr, "Failed to initialize GLEW\n");
+        return -1;
     }
 
-#ifdef DEBUG
-    std::cout << "Debug run" << std::endl;
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(glMessageCallback, nullptr);
-#else
-    std::cout << "Release run" << std::endl;
-#endif
-
-    std::cout << glGetString(GL_VERSION) << std::endl;
-
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     {
-        float positions[] = {
-                -0.5f, -0.5f, 0.0f, 0.0f,
-                0.5f, -0.5f, 1.0f, 0.0f,
-                0.5f, 0.5f, 1.0f, 1.0f,
-                -0.5f, 0.5f, 0.0f, 1.0f
+        float g_vertex_buffer_data[9] = {
+                -1.0f, -1.0f, 0.0f,
+                1.0f, -1.0f, 0.0f,
+                0.0f, 1.0f, 0.0f,
         };
 
-        unsigned int indices[] = {
-                0, 1, 2,
-                2, 3, 0
-        };
-
-        glEnable(GL_TEXTURE_2D);
-        glCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-        glCall(glEnable(GL_BLEND));
-
+        // -----------------------------------------------------------------------------------------------------------------
         VertexArray va;
-        VertexBuffer vb(positions, 4 * 4 * sizeof(float));
+        va.bind();
 
-        VertexBufferLayout layout;
-        layout.pushFloat(2);
-        layout.pushFloat(2);
-        va.addBuffer(vb, layout);
+        // This will identify our vertex buffer
+        VertexBuffer vb(g_vertex_buffer_data, sizeof(g_vertex_buffer_data));
 
-        IndexBuffer ib(indices, 6);
-
-        Shader shader("shader/BaseVertexShader.glsl", "shader/BaseFragmentShader.glsl");
-        shader.bind();
-
-        Texture texture("resources/img/no_image.png");
-        texture.bind();
-        shader.setUniform1i("u_Texture", 0);
-
-        va.unbind();
-        vb.unbind();
-        shader.unbind();
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, vb._rendererId);
+        glVertexAttribPointer(
+                0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+                3,                  // size
+                GL_FLOAT,           // type
+                GL_FALSE,           // normalized?
+                0,                  // stride
+                (void *) 0            // array buffer offset
+        );
+        // -----------------------------------------------------------------------------------------------------------------
 
         Renderer renderer;
+        Shader shader("shader/BaseVertexShader.glsl", "shader/BaseFragmentShader.glsl");
 
-        ImGui::CreateContext();
+        do {
+            // Clear the screen. It's not mentioned before Tutorial 02, but it can cause flickering, so it's there nonetheless.
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ImGui::StyleColorsDark();
+            // Draw nothing, see you in tutorial 2 !
 
-        ImGuiStyle& style = ImGui::GetStyle();
+            renderer.drawArrays(va, shader);
 
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init((char *)glGetString(GL_NUM_SHADING_LANGUAGE_VERSIONS));
-
-        UI ui;
-
-        /* Loop until the user closes the window */
-        while (!glfwWindowShouldClose(window)) {
-            /* Render here */
-
-            renderer.clear();
-
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-
-            ui.render(window);
-            ImGui::Begin("Test image output");
-            ImGui::Image((void*) texture.getId(), ImVec2(texture.getWidth(), texture.getHeight()), ImVec2(0, 1), ImVec2(1, 0));
-            ImGui::End();
-
-            texture.bind();
-            renderer.draw(va, ib, shader);
-
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-            /* Swap front and back buffers */
+            // Swap buffers
             glfwSwapBuffers(window);
-
-            /* Poll for and process events */
             glfwPollEvents();
-        }
+
+        } // Check if the ESC key was pressed or the window was closed
+        while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
+               glfwWindowShouldClose(window) == 0);
     }
-
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-
-    ImGui::DestroyContext();
-
-    glfwTerminate();
-    return 0;
 }
+
