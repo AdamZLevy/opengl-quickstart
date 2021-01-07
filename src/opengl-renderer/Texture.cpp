@@ -1,8 +1,19 @@
 #include "Texture.h"
 #include "stb_image.h"
+#include "Renderer.h"
+
+Texture::Texture(): _rendererId(0), _localBuffer(nullptr), _width(0), _height(0), _bpp(0) {
+    glCall(glGenTextures(1, &_rendererId));
+    glCall(glBindTexture(GL_TEXTURE_2D, _rendererId));
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1024, 768, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+
+    glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+    glCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+}
 
 Texture::Texture(const std::string &filePath)
-: _rendererId(0), _filePath(filePath), _localBuffer(nullptr), _width(0), _bpp(0) {
+: _rendererId(0), _filePath(filePath), _localBuffer(nullptr), _width(0), _height(0), _bpp(0) {
     stbi_set_flip_vertically_on_load(1);
     _localBuffer = stbi_load(_filePath.c_str(), &_width, &_height, &_bpp, 4);
 

@@ -1,7 +1,6 @@
 #ifndef OPENGL_QUICKSTART_TEXTURE_H
 #define OPENGL_QUICKSTART_TEXTURE_H
-
-#include "Renderer.h"
+#include "string"
 
 class Texture {
 private:
@@ -10,6 +9,7 @@ private:
     unsigned char *_localBuffer;
     int _width, _height, _bpp;
 public:
+    Texture();
     Texture(const std::string &filePath);
 
     virtual ~Texture();

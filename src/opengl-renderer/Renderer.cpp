@@ -29,3 +29,26 @@ void Renderer::drawArrays(const VertexArray &va, const Shader &shader, const uns
 void Renderer::clear() const {
     glCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
+
+void Renderer::bindFrameBuffer(unsigned int frameBufferId) {
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferId);
+}
+
+unsigned int Renderer::createFrameBuffer() {
+    unsigned int framebufferId;
+    glGenFramebuffers(1, &framebufferId);
+    glBindFramebuffer(GL_FRAMEBUFFER, framebufferId);
+    return framebufferId;
+}
+
+void Renderer::assignTextureToBuffer(unsigned int textureId) {
+    GLuint depthRenderBuffer;
+    glGenRenderbuffers(1, &depthRenderBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 1024, 768);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer);
+
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, textureId, 0);
+    GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, drawBuffers);
+}

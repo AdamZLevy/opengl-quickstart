@@ -2,6 +2,7 @@
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "Texture.h"
 
 #ifndef OPENGL_QUICKSTART_RENDERER_H
 #define OPENGL_QUICKSTART_RENDERER_H
@@ -23,7 +24,10 @@ class Renderer {
 public:
     void clear() const;
     void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
-    void drawArrays(const VertexArray& va, const Shader& shader, const unsigned int size) const;
+    void drawArrays(const VertexArray& va, const Shader& shader, unsigned int size) const;
+    unsigned int createFrameBuffer();
+    void bindFrameBuffer(unsigned int frameBufferId);
+    void assignTextureToBuffer(unsigned int textureId);
 };
 
 #endif //OPENGL_QUICKSTART_RENDERER_H
