@@ -6,7 +6,8 @@
 #ifndef OPENGL_QUICKSTART_RENDERER_H
 #define OPENGL_QUICKSTART_RENDERER_H
 
-#define ASSERT(x) if (!(x)) __debugbreak();
+//#define ASSERT(x) if (!(x)) __debugbreak();
+#define ASSERT(x) (x);
 
 #ifdef DEBUG
 #define glCall(x) glClearErrors(); x; ASSERT(glPrintErrors(#x, __FILE__, __LINE__))
@@ -22,7 +23,7 @@ class Renderer {
 public:
     void clear() const;
     void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
-    void drawArrays(const VertexArray& va, const Shader& shader) const;
+    void drawArrays(const VertexArray& va, const Shader& shader, const unsigned int size) const;
 };
 
 #endif //OPENGL_QUICKSTART_RENDERER_H

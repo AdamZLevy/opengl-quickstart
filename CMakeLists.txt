@@ -16,6 +16,7 @@ add_definitions(
 # libraries setup
 set(GLFW_PATH lib/glfw-3.3.2)
 set(GLEW_PATH lib/glew-2.1.0)
+set(GLM_PATH lib/glm-0.9.9.8)
 set(IMGUI_PATH lib/imgui-docking)
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -27,6 +28,7 @@ add_subdirectory(${GLFW_PATH})
 include_directories(
         ${GLFW_PATH}/include/GLFW
         ${GLEW_PATH}/include
+        ${GLM_PATH}/glm
         ${IMGUI_PATH}
         lib
 )

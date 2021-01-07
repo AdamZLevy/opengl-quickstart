@@ -13,6 +13,7 @@ UI::~UI() {
 }
 
 void UI::render(GLFWwindow* window) {
+    ImGui::ShowDemoWindow();
     for (const auto &item : _widgets) {
         item->render(window);
     }

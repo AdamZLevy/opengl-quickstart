@@ -8,6 +8,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <glm.hpp>
 
 class Shader {
 private:
@@ -26,9 +27,10 @@ public:
 
     void setUniform1i(const std::string& name, int v0);
     void setUniform4f(const std::string& name, float v0, float v1, float v2, float v3);
+    void setMatrix4fv(const std::string &name, glm::mat4 mvp);
+    unsigned int getUniformLocation(const std::string& name);
 
 private:
-    unsigned int getUniformLocation(const std::string& name);
     static unsigned int compileShader(unsigned int type, const std::string &source);
     static unsigned int createShader(const std::string &vertexShader, const std::string &fragmentShader);
     static std::string getShaderTypeStr(unsigned int type);

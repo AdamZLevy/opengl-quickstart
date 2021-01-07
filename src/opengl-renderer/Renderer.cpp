@@ -20,10 +20,10 @@ void Renderer::draw(const VertexArray &va, const IndexBuffer &ib, const Shader &
     glCall(glDrawElements(GL_TRIANGLES, ib.getCount(), GL_UNSIGNED_INT, nullptr));
 }
 
-void Renderer::drawArrays(const VertexArray &va, const Shader &shader) const {
+void Renderer::drawArrays(const VertexArray &va, const Shader &shader, const unsigned int size) const {
     shader.bind();
     va.bind();
-    glCall(glDrawArrays(GL_TRIANGLES, 0, 3));
+    glCall(glDrawArrays(GL_TRIANGLES, 0, size));
 }
 
 void Renderer::clear() const {
