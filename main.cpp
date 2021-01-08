@@ -25,6 +25,14 @@ static void GLAPIENTRY glMessageCallback(GLenum source, GLenum type, GLuint id, 
     printf("%s\n", message);
 }
 
+float cx = 4;
+bool viewWindowActive = false;
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (viewWindowActive) cx += yoffset * 0.05;
+}
+
 int main() {
     glewExperimental = true; // Needed for core profile
     if (!glfwInit()) {
@@ -175,9 +183,11 @@ int main() {
 
         int width;
         int height;
-        float cx = 4;
+//        float cx = 4;
         float cy = 3;
         float cz = 3;
+        float deltaTime = 1;
+        float speed = 0.05;
 
         Texture texture("resources/img/texture.png");
         texture.bind();
@@ -194,6 +204,14 @@ int main() {
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
+
+            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && viewWindowActive) {
+                cz += deltaTime * speed;
+            }
+            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS  && viewWindowActive) {
+                cz -= deltaTime * speed;
+            }
+            glfwSetScrollCallback(window, scroll_callback);
 
             // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
             glm::mat4 projection = glm::perspective(glm::radians(45.0f),
@@ -234,6 +252,7 @@ int main() {
             ImGui::Begin("Render to texture");
             windowSize = ImGui::GetWindowSize();
             ImGui::Image((void*) renderedTexture.getId(), windowSize, ImVec2(0, 1), ImVec2(1, 0));
+            viewWindowActive = ImGui::IsWindowHovered();
             ImGui::End();
 
             ui.render(window);
@@ -256,4 +275,3 @@ int main() {
     glfwTerminate();
     return 0;
 }
-
